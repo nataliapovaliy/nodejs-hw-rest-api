@@ -36,9 +36,10 @@ router.delete('/:contactId', async (req, res, next) => {
 })
 
 router.put('/:contactId', async (req, res, next) => {
+  const { contactId } = req.params;
+  const { name, email, phone } = req.body;
   try {
-    const { contactId, body } = req.params;
-    const newContacts = await contacts.updateContact(contactId, body);
+    const newContacts = await contacts.updateContact(contactId, { name, email, phone });
     res.status(201).json(newContacts);
   } catch (error) { next(error); }
 })
