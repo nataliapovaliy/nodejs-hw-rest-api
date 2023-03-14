@@ -2,8 +2,6 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
-// require('dotenv').config()
-
 const app = express();
 
 app.use(express.json());
@@ -39,25 +37,3 @@ mongoose.connect(uriDb)
     console.log(error.message)
     process.exit(1)
 })
-
-
-// const PORT = 3000
-// const uriDb = "mongodb+srv://npovaliy:Heduff7g2shs82YZ@cluster0.xaqgftq.mongodb.net/db-contacts?retryWrites=true&w=majority"
-
-// const connection = mongoose.connect(uriDb, {
-//   promiseLibrary: global.Promise,
-//   useNewUrlParser: true,
-//   useCreateIndex: true,
-//   useUnifiedTopology: true,
-//   useFindAndModify: false,
-// })
-
-// connection
-//   .then(() => {
-//     app.listen(PORT, function () {
-//       console.log(`Server running. Use our API on port: ${PORT}`)
-//     })
-//   })
-//   .catch((err) =>
-//     console.log(`Server not running. Error message: ${err.message}`),
-//   )

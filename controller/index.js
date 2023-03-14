@@ -108,27 +108,36 @@ const remove = async (req, res, next) => {
 
 const updateStatus = async (req, res, next) => {
     const { contactId } = req.params;
-    const { favorite = false } = req.body;
+    const { favorite } = req.body;
+
     try {
-    const result = await service.updateStatusContact(contactId, { favorite })
-    if (result) {
-        res.json({
-            status: 'success',
-            code: 200,
-            data: { task: result },
-        })
-        } else {
-            res.status(404).json({
+        if(!favorite) res.status(400).json({
                 status: 'error',
-                code: 404,
+                code: 400,
                 message: 'Missing field favorite',
                 data: 'Not Found',
+        })
+        
+        const result = await service.updateStatusContact(contactId, { favorite }, { new: true })
+
+        if (result) {
+            res.json({
+                status: 'success',
+                code: 200,
+                data: { contacts: result },
             })
+            } else {
+                res.status(404).json({
+                    status: 'error',
+                    code: 404,
+                    message: `Not found contact id: ${contactId}`,
+                    data: 'Not Found',
+                })
+            }
+        } catch (error) {
+            console.error(error);
+            next(error);
         }
-    } catch (error) {
-        console.error(error);
-        next(error);
-    }
 }
 
 module.exports = {
