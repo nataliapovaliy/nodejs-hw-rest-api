@@ -9,10 +9,10 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const userRouter = require('./api/userRouter');
+const userRouter = require('./routes/userRouter');
 app.use('/users/', userRouter);
 
-const contactsRouter = require('./api');
+const contactsRouter = require('./routes');
 app.use('/api/', contactsRouter);
 
 app.use((err, req, res, next) => {

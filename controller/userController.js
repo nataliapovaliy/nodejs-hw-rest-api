@@ -1,6 +1,8 @@
 const User = require('../service/schemas/user');
 const HttpError = require('../utils/httpError');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 const register = async (req, res, next) => {
     try {
@@ -18,7 +20,7 @@ const register = async (req, res, next) => {
 
         res.status(200).json({ user });
     } catch (error) {
-        next();
+        next(error);
     }
 }
 
@@ -31,9 +33,14 @@ const login = async (req, res, next) => {
             throw new HttpError(401, 'Wrong credentials')
         }
 
+        const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
+        const token = jwt.sign({ id: candidate._id, email: candidate.email }, JWT_SECRET_KEY, { expiresIn: '1h' });
         
+        await User.findOneAndUpdate({ email }, { token });
+
+        res.status(200).json({ token });
     } catch (error) {
-        
+        next(error);
     }
 }
 
