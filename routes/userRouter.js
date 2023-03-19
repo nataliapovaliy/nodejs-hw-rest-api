@@ -1,9 +1,11 @@
-const express = require('express')
+const express = require('express');
 const router = express.Router();
 const controller = require('../controller/userController');
+const checkJwt = require('../middlewares/checkJwt');
 
 router.post('/register', controller.register);
 router.post('/login', controller.login);
-router.get('/logout', controller.logout);
+router.get('/logout', checkJwt, controller.logout);
+router.post('/current', checkJwt, controller.current);
 
 module.exports = router;

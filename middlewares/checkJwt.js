@@ -10,21 +10,21 @@ const checkJwt = async (req, res, next) => {
         const token = req.headers.authorization?.split(' ')[1];
 
         if (!token) {
-            throw new HttpError(401, 'Unauthorized');            
+            throw new HttpError(401, 'Not authorized');            
         }
 
         const payload = jwt.verify(token, JWT_SECRET_KEY);
 
         const user = await User.findOne({ _id: payload.id });
 
-        if (!user) {
-            throw new HttpError(401, 'Unauthorized');  
+        if (!user || !user.token) {
+            throw new HttpError(401, 'Not authorized');  
         }
 
         req.user = user;
         next();
     } catch (error) {
-        
+        next(error);
     }     
 }
 
