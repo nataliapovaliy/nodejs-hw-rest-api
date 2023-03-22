@@ -57,18 +57,11 @@ const logout = async (req, res, next) => {
 const current = async (req, res, next) => {
     try {
         const { user } = req;
-        const result = await User.findOne({ token: user.token });
+        await User.findOne({ token: user.token });
 
-        if(result) {res.status(200).json({
-            // data: { email: user.email, subscription: user.subscription },
+        res.status(200).json({
             data: { email: user.email, subscription: user.subscription },
-        })} else {
-                res.status(401).json({
-                    status: 'Unauthorized',
-                    code: 401,
-                    message: 'Not authorized',
-                })
-            };
+        });
     } catch (error) {
         next(error);
     }

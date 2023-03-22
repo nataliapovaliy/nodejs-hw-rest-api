@@ -1,8 +1,9 @@
 const service = require('../service/index');
 
 const get = async (req, res, next) => {
+    const { _id } = req.user;
     try {
-        const result = await service.listContacts();
+        const result = await service.listContacts({owner: _id});
         res.json({
             status: 'success',
             code: 200,
@@ -43,9 +44,10 @@ const getById = async (req, res, next) => {
 }
 
 const create = async (req, res, next) => {
-    const { name, email, phone } = req.body
+    const { _id } = req.user;
+    console.log('user>>>>>', req.user);
     try {
-        const result = await service.addContact({ name, email, phone })
+        const result = await service.addContact({ ...req.body, owner: _id });
         res.status(201).json({
             status: 'success',
             code: 201,
