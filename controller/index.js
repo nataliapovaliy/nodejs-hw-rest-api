@@ -2,8 +2,13 @@ const service = require('../service/index');
 
 const get = async (req, res, next) => {
     const { _id } = req.user;
+    
+    console.log(req.query);  // params - Параметры запроса page, limit
+    const { page = 1, limit = 20 } = req.query;
+    const skip = (page - 1) * limit;
+
     try {
-        const result = await service.listContacts({owner: _id});
+        const result = await service.listContacts({owner: _id}, skip, limit);
         res.json({
             status: 'success',
             code: 200,
