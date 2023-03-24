@@ -2,7 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
-// const PORT = process.env.PORT || 3000;
+require('dotenv').config()
+const PORT = process.env.PORT || 3000;
 
 const app = express();
 
@@ -18,6 +19,14 @@ app.use('/api/', contactsRouter);
 app.use((err, req, res, next) => {
   const { message, statusCode = 500 } = err;
   res.status(statusCode).json({ error: message });
+})
+
+mongoose.connect(PORT)
+  .then(() => 
+    app.listen(3000, () => console.log("Database connection successfull")))
+  .catch(error => {
+    console.log(error.message)
+    process.exit(1)
 })
 
 // app.use((_, res, __) => {
@@ -38,12 +47,3 @@ app.use((err, req, res, next) => {
 //     data: 'Internal Server Error',
 //   })
 // })
-
-const uriDb = "mongodb+srv://npovaliy:Heduff7g2shs82YZ@cluster0.xaqgftq.mongodb.net/db-contacts?retryWrites=true&w=majority"
-mongoose.connect(uriDb)
-  .then(() => 
-    app.listen(3000, () => console.log("Database connection successfull")))
-  .catch(error => {
-    console.log(error.message)
-    process.exit(1)
-})
