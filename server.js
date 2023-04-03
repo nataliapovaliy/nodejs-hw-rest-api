@@ -2,13 +2,14 @@ const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 
-require('dotenv').config()
-const PORT = process.env.PORT || 3000;
+require('dotenv').config();
+const PORT = process.env.MONGO_CONNECTION_STRING || 3000;
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
+app.use(express.static('public'));
 
 const userRouter = require('./routes/userRouter');
 app.use('/users/', userRouter);
@@ -28,6 +29,9 @@ mongoose.connect(PORT)
     console.log(error.message)
     process.exit(1)
 })
+
+
+
 
 // app.use((_, res, __) => {
 //   res.status(404).json({
