@@ -20,6 +20,10 @@ const user = new Schema({
         type: String,
         required: false,
         default: null
+    },
+    avatarURL: {
+        type: String,
+        required: true
     }
 })
 
