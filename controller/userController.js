@@ -5,7 +5,11 @@ const jwt = require('jsonwebtoken');
 const gravatar = require("gravatar");
 const path = require('path');
 const fs = require('fs/promises');
+const { nanoid } = require('nanoid');
+const sendEmail = require('../helpers/sendEmail');
+
 require('dotenv').config();
+const { BASE_URL } = process.env;
 
 const register = async (req, res, next) => {
     try {
@@ -19,7 +23,17 @@ const register = async (req, res, next) => {
         const salt = bcrypt.genSaltSync(10);
         const hashedPassword = bcrypt.hashSync(password, salt);
         const avatarURL = gravatar.url(email);
-        const user = await User.create({ email, password: hashedPassword, avatarURL });
+        const verificationToken = nanoid();
+
+        const user = await User.create({ email, password: hashedPassword, avatarURL, verificationToken });
+        
+        const verifyEmail = {
+            to: email,
+            subject: "Verify email",
+            html: `<a target="_blank" href="${BASE_URL}/api/user/verify/${verificationToken}">Click verify email</a>`
+        };
+
+        await sendEmail(verifyEmail);
 
         res.status(200).json({ user });
     } catch (error) {
@@ -34,6 +48,10 @@ const login = async (req, res, next) => {
         const candidate = await User.findOne({ email });
         if (!candidate || !bcrypt.compareSync(password, candidate.password)) {
             throw new HttpError(401, 'Wrong credentials')
+        }
+
+        if (!candidate.verify) {
+            throw new HttpError(401, 'Email verification is required')
         }
 
         const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY;
