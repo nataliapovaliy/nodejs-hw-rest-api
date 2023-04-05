@@ -8,7 +8,7 @@ const app = express();
 app.get("/login", login);
 
 describe("test login controller", () => {
-    beforAll(() => app.listen(3000));
+    // beforAll(() => app.listen(3000));
     // afterAll(() => app.close());
 
     test("login return status", async () => {
