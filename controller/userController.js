@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const gravatar = require("gravatar");
 const path = require('path');
 const fs = require('fs/promises');
-const { nanoid } = require('nanoid');
+const { v4: uuidv4 } = require('uuid');
 const sendEmail = require('../helpers/sendEmail');
 
 require('dotenv').config();
@@ -23,7 +23,7 @@ const register = async (req, res, next) => {
         const salt = bcrypt.genSaltSync(10);
         const hashedPassword = bcrypt.hashSync(password, salt);
         const avatarURL = gravatar.url(email);
-        const verificationToken = nanoid();
+        const verificationToken = uuidv4();
 
         const user = await User.create({ email, password: hashedPassword, avatarURL, verificationToken });
         
@@ -36,6 +36,44 @@ const register = async (req, res, next) => {
         await sendEmail(verifyEmail);
 
         res.status(200).json({ user });
+    } catch (error) {
+        next(error);
+    }
+}
+
+const verifyEmail = async (req, res, next) => {
+    const { verificationToken } = req.params;
+    try {
+        const user = await User.findOne({ verificationToken });
+    if (!user) {
+            throw new HttpError(401, "Email not found");
+    }
+    await User.findByIdAndUpdate(user._id, { verify: true, verificationToken: "" });
+    res.status(200).json({ message: "Email verify success" });
+    } catch (error) {
+        next(error);
+    }   
+}
+
+const resendVerifyEmail = async (req, res, next) => {
+    const { email } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            throw new HttpError(401, "Email not found");
+        }
+        if (user.verify) {
+            throw new HttpError(400, "Verification has already been passed");
+        }
+
+        const verifyEmail = {
+            to: email,
+            subject: "Verify email",
+            html: `<a target="_blank" href="${BASE_URL}/api/user/verify/${user.verificationToken}">Click verify email</a>`
+        };
+        await sendEmail(verifyEmail);
+        res.status(200).json({ message: "Verify email send success" });
+
     } catch (error) {
         next(error);
     }
@@ -108,6 +146,8 @@ const updateAvatar = async (req, res) => {
 
 module.exports = {
     register,
+    verifyEmail,
+    resendVerifyEmail,
     login,
     logout,
     current,
