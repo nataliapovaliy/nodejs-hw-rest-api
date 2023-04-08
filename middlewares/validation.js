@@ -33,7 +33,21 @@ const validateUser = async (req, res, next) => {
     next();
 }
 
+const validateEmail = async (req, res, next) => {
+    const schema = Joi.object({
+        email: Joi.string()
+            .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'org'] } })
+            .required(),
+    })
+    const validationResult = schema.validate(req.body);
+    if (validationResult.error) {
+        return res.status(400).json({status: validationResult.error})
+    }
+    next();
+}
+
 module.exports = {
     validateContacts,
-    validateUser
+    validateUser,
+    validateEmail
 }
